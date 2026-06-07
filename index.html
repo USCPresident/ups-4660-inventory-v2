@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPS 4660 Inventory</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
+        header { background: #2c2c2c; color: #ffcc00; padding: 15px; text-align: center; }
+        .search { padding: 15px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 15px; font-size: 1.1rem; border: 1px solid #ddd; border-radius: 8px; }
+        .item-card { background: white; margin: 12px; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .item-card img { width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 12px; background: #f9f9f9; }
+        .urgent { border-left: 6px solid #d32f2f; }
+        .footer { text-align: center; padding: 20px 15px; font-size: 0.85rem; color: #555; background: #f4f4f4; border-top: 1px solid #ddd; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UPS Housekeeping & Porter Supply</h1>
+        <p>Center 4660 Inventory</p>
+    </header>
+
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Search items..." onkeyup="filterItems()">
+    </div>
+
+    <div id="itemsContainer"></div>
+
+    <div class="footer">
+        Internal Tool — UPS Center 4660 Housekeeping & Porter Supply Inventory<br>
+        Maintained by Adam Valdez (Preload Seniority 1/3/2005)<br>
+        Built with assistance from Grok by xAI • Hosted on GitHub<br>
+        For internal use only. Not an official UPS document.
+    </div>
+
+    <script>
+        const inventory = [
+            {name: "GEORGIA-PACIFIC Paper Towel Roll Brown (Women's & Men's)", number: "143407 / 2U232", daily: 6, stock: 3, image: "https://static.grainger.com/rp/s/is/image/Grainger/2U232_AW01?$adapimg$&hei=536&wid=536"},
+            {name: "SCOTT Toilet Paper Roll 2 Ply", number: "142200 / 42EN65", daily: 8, stock: 5, image: "https://static.grainger.com/rp/s/is/image/Grainger/67805_P01__ZXNX_v1?$adapimg$&hei=536&wid=536"},
+            {name: "GOJO Hand Wash Series LTX-12 1200 mL Foam", number: "1911-02 / 15E819", daily: 2, stock: 6, image: ""},
+            {name: "HOSPECO Sanitary Napkin Receptacle Liner HS-6141", number: "HS-6141 / 3U824", daily: 1, stock: 1, image: ""},
+            {name: "Torpedo trash bags 33x39", number: "3339int", daily: 3, stock: 3, image: ""},
+            {name: "Can Liner 27x42", number: "621821int", daily: 4, stock: 4, image: ""},
+            {name: "Windex 10083792", number: "10083792", daily: 0.5, stock: 0.5, image: ""},
+            {name: "Office garbage bags", number: "35960int", daily: 2, stock: 2, image: ""},
+            {name: "Solution tablets #15300 (Bleach)", number: "15300", daily: 1, stock: 1, image: ""},
+            {name: "Wipe center pulls", number: "10059455", daily: 2, stock: 2, image: ""},
+            {name: "Driver release bags", number: "190103", daily: 2, stock: 2, image: ""},
+            {name: "Kraft paper (wrapping paper)", number: "172303", daily: 1, stock: 1, image: ""},
+            {name: "56 gal bags", number: "620000int", daily: 1, stock: 1, image: ""},
+            {name: "Windshield Towels (blue)", number: "143404", daily: 2, stock: 2, image: ""},
+            {name: "Glass Cleaner", number: "10083792", daily: 0.3, stock: 0.3, image: ""},
+            {name: "Absorbent - speedi dry", number: "230035", daily: 0.5, stock: 0.5, image: ""},
+            {name: "17x14x9 box", number: "170433", daily: 1, stock: 1, image: ""},
+            {name: "36x15x15 box", number: "170451", daily: 1, stock: 1, image: ""},
+            {name: "Load Chart holders", number: "BAW1012FSNPB", daily: 0.2, stock: 0.2, image: ""},
+            {name: "Face shields", number: "p035-207913", daily: 0.5, stock: 0.5, image: ""},
+            {name: "Sealant Tape", number: "145001", daily: 0.5, stock: 0.5, image: ""},
+            {name: "Data Aq Labels", number: "1777601", daily: 1, stock: 1, image: ""},
+            {name: "Clear tape 8934 48mm", number: "8934", daily: 0.5, stock: 0.5, image: ""},
+            {name: "Bug Sponge", number: "211301", daily: 0.5, stock: 0.5, image: ""},
+            {name: "Shut-off Valve", number: "211723", daily: 0.1, stock: 0.1, image: ""},
+            {name: "Squeegee 8\"", number: "211306", daily: 0.2, stock: 0.2, image: ""},
+            {name: "Knee Wash Boots", number: "31151", daily: 0.3, stock: 0.3, image: ""},
+            {name: "Hog hair Brush", number: "21070", daily: 0.2, stock: 0.2, image: ""},
+            {name: "Wash hose", number: "829fz3", daily: 0.1, stock: 0.1, image: ""},
+            {name: "Tire brush", number: "21010", daily: 0.2, stock: 0.2, image: ""},
+            {name: "Small Sort lights", number: "6667133", daily: 0.3, stock: 0.3, image: ""},
+            {name: "NP-610-800 MEGA Executive Dry Paper Towels", number: "NP-610-800", daily: 6, stock: 1, image: ""},
+            {name: "Jumbo Roll Tissue JRT1210002 Georgia Pacific", number: "JRT1210002", daily: 8, stock: 1, image: ""},
+            {name: "M.Net Effaceur Magique Cleaning Wipes", number: "", daily: 2, stock: 5, image: ""},
+            {name: "Procelle Constant Batteries", number: "501303", daily: 0.5, stock: 1, image: ""},
+            {name: "TimeMist Premium Air Freshener Dutch Apple & Spice", number: "", daily: 0.3, stock: 4, image: ""},
+            {name: "Airworks Mango Urinal Screens AWUS007-BX", number: "AWUS007-BX", daily: 0.5, stock: 1, image: ""},
+            {name: "Uline S-13277 55-60 GAL Black Trash Liner", number: "S-13277", daily: 2, stock: 1, image: ""},
+            {name: "Shilcraft Jumbo Roll Tissue 2 Ply", number: "25040", daily: 8, stock: 3, image: ""},
+            {name: "UPS742CLUS Trash Bags 27x42", number: "UPS742CLUS", daily: 4, stock: 5, image: ""},
+            {name: "Novex Natural Roll Towel J5600", number: "J5600", daily: 6, stock: 3, image: ""},
+            {name: "Can Liners LLDPE Clear 15x9x23", number: "35960int2", daily: 4, stock: 3, image: ""},
+            {name: "Can Liners Coreless Interleaved Inteplast", number: "", daily: 5, stock: 5, image: ""}
+        ];
+
+        function renderItems(filtered) {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+            filtered.forEach(item => {
+                const days = (item.stock / item.daily).toFixed(1);
+                const isUrgent = days < 7;
+                const card = document.createElement('div');
+                card.className = `item-card ${isUrgent ? 'urgent' : ''}`;
+                card.innerHTML = `
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
+                    <strong>${item.name}</strong><br>
+                    Item #: ${item.number || 'N/A'}<br>
+                    Stock: <strong>${item.stock}</strong> | Daily: ${item.daily} | Days Left: ~${days}<br>
+                    <span style="color: ${isUrgent ? '#d32f2f' : '#2e7d32'}; font-weight:bold;">
+                        ${isUrgent ? 'URGENT — ORDER NOW' : 'OK'}
+                    </span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterItems() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = inventory.filter(i => i.name.toLowerCase().includes(term));
+            renderItems(filtered.length ? filtered : inventory);
+        }
+
+        renderItems(inventory);
+    </script>
+</body>
+</html>
