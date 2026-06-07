@@ -36,8 +36,8 @@
 
     <script>
         const inventory = [
-            {name: "GEORGIA-PACIFIC Paper Towel Roll Brown (Women's & Men's)", number: "143407 / 2U232", daily: 6, stock: 3, grainger: "https://www.grainger.com/product/GEORGIA-PACIFIC-Paper-Towel-Roll-Brown-2U232"},
-            {name: "SCOTT Toilet Paper Roll 2 Ply", number: "142200 / 42EN65", daily: 8, stock: 5, grainger: "https://www.grainger.com/product/SCOTT-Toilet-Paper-Roll-2-Ply-42EN65"},
+            {name: "GEORGIA-PACIFIC Paper Towel Roll Brown (Women's & Men's)", number: "143407 / 2U232", daily: 6, stock: 3, image: "https://static.grainger.com/rp/s/is/image/Grainger/2U232_AW01?$adapimg$&hei=536&wid=536", grainger: "https://www.grainger.com/product/GEORGIA-PACIFIC-Paper-Towel-Roll-Brown-2U232"},
+            {name: "SCOTT Toilet Paper Roll 2 Ply", number: "142200 / 42EN65", daily: 8, stock: 5, image: "https://static.grainger.com/rp/s/is/image/Grainger/67805_P01__ZXNX_v1?$adapimg$&hei=536&wid=536", grainger: "https://www.grainger.com/product/SCOTT-Toilet-Paper-Roll-2-Ply-42EN65"},
             {name: "GOJO Hand Wash Series LTX-12 1200 mL Foam", number: "1911-02 / 15E819", daily: 2, stock: 6, grainger: "https://www.grainger.com/product/GOJO-Hand-Wash-Series-LTX-12-15E819"},
             {name: "HOSPECO Sanitary Napkin Receptacle Liner HS-6141", number: "HS-6141 / 3U824", daily: 1, stock: 1, grainger: "https://www.grainger.com/product/HOSPECO-Sanitary-Napkin-Receptacle-3U824"},
             {name: "Torpedo trash bags 33x39", number: "3339int", daily: 3, stock: 3},
@@ -70,6 +70,7 @@
                 const card = document.createElement('div');
                 card.className = `item-card ${isUrgent ? 'urgent' : ''}`;
                 card.innerHTML = `
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
                     <strong>${item.name}</strong><br>
                     Item #: ${item.number}<br>
                     Stock: <strong>${item.stock}</strong> | Daily: ${item.daily} | Days Left: ~${days}<br>
