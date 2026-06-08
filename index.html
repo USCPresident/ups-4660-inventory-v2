@@ -15,7 +15,7 @@
         input { width: 100%; padding: 12px; font-size: 1.1rem; }
         .item-card { background: white; margin: 12px; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         button { padding: 10px 16px; background: #1976d2; color: white; border: none; border-radius: 6px; margin: 5px; }
-        input[type="number"] { width: 90px; padding: 6px; font-size: 1rem; }
+        .stock-input { width: 120px; padding: 8px; font-size: 1.1rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -44,7 +44,7 @@
     </div>
 
     <div id="safetyTab" style="display:none; padding:15px;">
-        <p>Safety Scan tab (camera and Ask Adam coming next update).</p>
+        <p>Safety Scan tab (camera and Ask Adam coming next).</p>
     </div>
 
     <div class="footer">
@@ -72,7 +72,7 @@
                 card.innerHTML = `
                     <strong>${item.name}</strong><br>
                     Item #: ${item.number}<br>
-                    <label>Stock: <input type="number" value="${item.stock}" onchange="updateStock(${index}, this.value)"></label><br>
+                    <label>Stock: <input type="number" class="stock-input" value="${item.stock}" onchange="updateStock(${index}, this.value)"></label><br>
                     Daily: ${item.daily} | Days Left: ~${days}
                 `;
                 container.appendChild(card);
