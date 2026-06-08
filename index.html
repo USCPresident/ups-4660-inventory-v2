@@ -31,8 +31,8 @@
 
     <div class="search">
         <input type="text" id="searchInput" placeholder="Search items..." onkeyup="filterItems()">
-        <button onclick="exportReorderList()">Export Reorder List</button>
-        <button onclick="emailReorderList()">Email Reorder List</button>
+        <button onclick="exportReorderList()">Export File</button>
+        <button onclick="emailReorderList()">Email Selected</button>
         <button onclick="copyReorderList()">Copy to Clipboard</button>
     </div>
 
@@ -93,7 +93,7 @@
                     ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
                     <strong>${item.name}</strong><br>
                     Item #: ${item.number}<br>
-                    <label>Stock: <input type="number" value="${item.stock}" style="width:80px" onchange="updateStock(${index}, this.value)"></label><br>
+                    <label>Stock: <input type="number" value="${item.stock}" onchange="updateStock(${index}, this.value)"></label><br>
                     Daily: ${item.daily} | Days Left: ~${days}<br>
                     ${item.grainger ? `<a href="${item.grainger}" target="_blank" style="color:#1976d2;">View on Grainger →</a><br>` : ''}
                     <span style="color: ${isUrgent ? '#d32f2f' : '#2e7d32'}; font-weight:bold;">
@@ -116,8 +116,12 @@
             renderItems(filtered.length ? filtered : inventory);
         }
 
+        function getUrgentItems() {
+            return inventory.filter(item => (item.stock / item.daily) < 14);
+        }
+
         function exportReorderList() {
-            const urgent = inventory.filter(item => (item.stock / item.daily) < 14);
+            const urgent = getUrgentItems();
             let text = "UPS 4660 Reorder List\nDate: " + new Date().toLocaleDateString() + "\n\n";
             urgent.forEach(item => {
                 const days = (item.stock / item.daily).toFixed(1);
@@ -131,24 +135,24 @@
         }
 
         function emailReorderList() {
-            const urgent = inventory.filter(item => (item.stock / item.daily) < 14);
+            const urgent = getUrgentItems();
             let body = "UPS 4660 Urgent Reorder List\nDate: " + new Date().toLocaleDateString() + "\n\n";
             urgent.forEach(item => {
                 const days = (item.stock / item.daily).toFixed(1);
-                body += `${item.name} - Item #: ${item.number} - Stock: ${item.stock} - Days Left: ~${days}\n`;
+                body += `${item.name}\nItem #: ${item.number}\nStock: ${item.stock} | Days Left: ~${days}\n\n`;
             });
             body += "\nPlease order through official UPS accounts.";
             window.location.href = `mailto:president@unitedstylescrew.com?subject=UPS 4660 Urgent Reorder List&body=${encodeURIComponent(body)}`;
         }
 
         function copyReorderList() {
-            const urgent = inventory.filter(item => (item.stock / item.daily) < 14);
+            const urgent = getUrgentItems();
             let text = "UPS 4660 Urgent Reorder List\nDate: " + new Date().toLocaleDateString() + "\n\n";
             urgent.forEach(item => {
                 const days = (item.stock / item.daily).toFixed(1);
                 text += `${item.name} - Item #: ${item.number} - Stock: ${item.stock} - Days Left: ~${days}\n`;
             });
-            navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard! Paste into Outlook."));
+            navigator.clipboard.writeText(text).then(() => alert("Copied! Paste into your Outlook email."));
         }
 
         loadStock();
@@ -156,4 +160,3 @@
     </script>
 </body>
 </html>
-CLEAN
