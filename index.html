@@ -14,6 +14,7 @@
         .item-card img { width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 12px; }
         .urgent { border-left: 6px solid #d32f2f; }
         .footer { text-align: center; padding: 20px 15px; font-size: 0.85rem; color: #555; background: #f4f4f4; border-top: 1px solid #ddd; line-height: 1.5; }
+        input[type="number"] { width: 80px; padding: 4px; }
     </style>
 </head>
 <body>
@@ -66,10 +67,19 @@
             {name: "Driver release bags", number: "190103", daily: 5, stock: 5}
         ];
 
+        function loadStock() {
+            const saved = localStorage.getItem('upsInventory');
+            if (saved) inventory = JSON.parse(saved);
+        }
+
+        function saveStock() {
+            localStorage.setItem('upsInventory', JSON.stringify(inventory));
+        }
+
         function renderItems(filtered) {
             const container = document.getElementById('itemsContainer');
             container.innerHTML = '';
-            filtered.forEach(item => {
+            filtered.forEach((item, index) => {
                 const days = (item.stock / item.daily).toFixed(1);
                 const isUrgent = days < 7;
                 const card = document.createElement('div');
@@ -78,7 +88,8 @@
                     ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
                     <strong>${item.name}</strong><br>
                     Item #: ${item.number}<br>
-                    Stock: <strong>${item.stock}</strong> | Daily: ${item.daily} | Days Left: ~${days}<br>
+                    <label>Stock: <input type="number" value="${item.stock}" style="width:80px" onchange="updateStock(${index}, this.value)"></label><br>
+                    Daily: ${item.daily} | Days Left: ~${days}<br>
                     ${item.grainger ? `<a href="${item.grainger}" target="_blank" style="color:#1976d2;">View on Grainger →</a><br>` : ''}
                     <span style="color: ${isUrgent ? '#d32f2f' : '#2e7d32'}; font-weight:bold;">
                         ${isUrgent ? 'URGENT — ORDER NOW' : 'OK'}
@@ -88,13 +99,21 @@
             });
         }
 
+        function updateStock(index, newStock) {
+            inventory[index].stock = parseFloat(newStock) || 0;
+            saveStock();
+            renderItems(inventory);
+        }
+
         function filterItems() {
             const term = document.getElementById('searchInput').value.toLowerCase();
             const filtered = inventory.filter(i => i.name.toLowerCase().includes(term));
             renderItems(filtered.length ? filtered : inventory);
         }
 
+        loadStock();
         renderItems(inventory);
     </script>
 </body>
 </html>
+CLEAN
