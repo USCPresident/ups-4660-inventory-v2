@@ -54,9 +54,9 @@
             <canvas id="photoCanvas" style="display:none;"></canvas>
             <img id="capturedPhoto" style="display:none; width:100%; border-radius:8px; margin-top:8px;">
 
-            <input type="text" id="issueDesc" placeholder="Describe the issue...">
+            <input type="text" id="issueDesc" placeholder="Describe the issue (e.g. hazardous spill, broken equipment)">
             <button onclick="askAdam()">Ask Adam</button>
-            <div id="adamResponse" style="margin-top:12px; padding:12px; background:#f0f0f0; border-radius:8px; min-height:60px;"></div>
+            <div id="adamResponse" style="margin-top:12px; padding:12px; background:#f0f0f0; border-radius:8px; min-height:80px;"></div>
 
             <h3>Send to Manager</h3>
             <select id="managerSelect"></select>
@@ -161,7 +161,7 @@
 
         function addNewContact() {
             const name = prompt("Manager / Supervisor Name:");
-            const number = prompt("Phone number (with country code, e.g. +1 574 123 4567):");
+            const number = prompt("Phone number (e.g. +1 574 123 4567):");
             if (name && number) {
                 contacts.push({name, number});
                 saveData();
@@ -174,13 +174,12 @@
             const selectedIndex = document.getElementById('managerSelect').value;
             const contact = contacts[selectedIndex];
             let text = `URGENT - Center 4660 Porter Report\nDate: ${new Date().toLocaleString()}\n\nDescription: ${desc}\n\nRecommended Supplies:\n• Absorbent - speedi dry\n• Solution tablets\n• PPE\n\nPhoto attached.\n\n- Adam Valdez, Porter`;
-            
             navigator.clipboard.writeText(text).then(() => {
-                alert(`✅ Report copied for ${contact.name}!\n\nOpen iMessage → Paste → Attach the photo you just took`);
+                alert(`✅ Report copied for ${contact.name}!\n\n1. Open iMessage\n2. Paste text\n3. Attach photo`);
             });
         }
 
-        // Camera functions
+        // Safety Scan Camera
         let currentPhoto = null;
         let stream = null;
 
@@ -214,7 +213,16 @@
         function askAdam() {
             const desc = (document.getElementById('issueDesc').value || "").toLowerCase();
             const responseDiv = document.getElementById('adamResponse');
-            responseDiv.innerHTML = `<strong>Adam:</strong><br>Please describe the issue and I'll give you the right supplies and safety steps.`;
+            let reply = "Adam here. Describe the issue and I'll give supplies + safety steps.";
+
+            if (desc.includes("spill") || desc.includes("hazard")) {
+                reply = "Hazardous Spill Protocol (OSHA 1910.120):<br>1. Contain the spill if safe.<br>2. Use Absorbent - Speedi Dry.<br>3. Wear PPE (gloves, face shield).<br>4. Clean with Solution tablets.<br>5. Notify supervisor and document.";
+            } else if (desc.includes("broken") || desc.includes("jack") || desc.includes("pallet")) {
+                reply = "Equipment Issue:<br>Tag out of service immediately.<br>Use alternate equipment.<br>Report to maintenance.<br>Supplies needed: Tape, Markers, Load Chart holders.";
+            } else if (desc.includes("blood") || desc.includes("bio")) {
+                reply = "Bloodborne Pathogens (OSHA 1910.1030): Use PPE, disinfect area, follow Teamsters 710 procedures.";
+            }
+            responseDiv.innerHTML = `<strong>Adam:</strong><br>${reply}`;
         }
 
         // Initialize
