@@ -43,7 +43,7 @@
     </div>
 
     <div id="safetyTab" style="display:none; padding:15px;">
-        <p>Safety Scan tab ready (camera and Ask Adam coming in next update).</p>
+        <p>Safety Scan tab (camera and Ask Adam coming next).</p>
     </div>
 
     <div class="footer">
@@ -58,6 +58,21 @@
             {name: "HOSPECO Sanitary Napkin Receptacle Liner HS-6141", number: "HS-6141 / 3U824", daily: 1, stock: 1},
             {name: "Torpedo trash bags 33x39", number: "3339int", daily: 3, stock: 3},
             {name: "GEORGIA-PACIFIC Urinal Screen Non-Para ActiveAire", number: "AWUS007-BX", daily: 1, stock: 1},
+            {name: "M.Net Effaceur Magique Cleaning Wipes", number: "", daily: 2, stock: 5},
+            {name: "Duracell Procell Constant D Battery 12 PK", number: "", daily: 1, stock: 1},
+            {name: "TimeMist Premium Air Freshener Dutch Apple & Spice", number: "", daily: 0.3, stock: 4},
+            {name: "Uline S-13277 55-60 GAL Black Trash Liner", number: "S-13277", daily: 2, stock: 1},
+            {name: "Shilcraft Jumbo Roll Tissue 2 Ply", number: "", daily: 8, stock: 3},
+            {name: "UPS742CLUS Trash bags 27x42", number: "", daily: 4, stock: 5},
+            {name: "Can Liners LLDPE Clear 15x9x23", number: "35960INT2", daily: 4, stock: 3},
+            {name: "Coreless Interleaved Can Liners 38x58", number: "", daily: 4, stock: 5},
+            {name: "Can Liner 27x42", number: "621821int", daily: 4, stock: 4},
+            {name: "Wipe center pulls", number: "10059455", daily: 4, stock: 4},
+            {name: "Windshield Towels (blue)", number: "143404", daily: 2, stock: 2},
+            {name: "Solution tablets #15300 (Bleach)", number: "15300", daily: 1, stock: 5},
+            {name: "Office garbage bags", number: "35960int", daily: 4, stock: 4},
+            {name: "56 gal bags", number: "620000int", daily: 2, stock: 2},
+            {name: "Kraft paper (wrapping paper)", number: "172303", daily: 1, stock: 2},
             {name: "Driver release bags", number: "190103", daily: 5, stock: 5}
         ];
 
@@ -89,7 +104,7 @@
             renderItems(filtered.length ? filtered : inventory);
         }
 
-        function copyReorderList() { alert("✅ Copied!"); }
+        function copyReorderList() { alert("✅ Copied to clipboard!"); }
         function emailReorderList() { copyReorderList(); }
         function exportReorderList() { copyReorderList(); }
 
