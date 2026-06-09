@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPS 4660 Inventory</title>
     <style>
-        body { font-family: system-ui, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-        header { background: #2c2c2c; color: #ffcc00; padding: 15px; text-align: center; }
-        .notice { background: #fff3cd; color: #856404; padding: 12px; text-align: center; font-weight: bold; }
-        .tabs { display: flex; background: #2c2c2c; }
-        .tab { flex: 1; padding: 12px; color: #ffcc00; text-align: center; cursor: pointer; }
-        .tab.active { background: #ffcc00; color: #2c2c2c; font-weight: bold; }
-        .search { padding: 15px; background: white; }
-        input { width: 100%; padding: 12px; font-size: 1.1rem; }
-        .item-card { background: white; margin: 12px; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        button { padding: 10px 16px; background: #1976d2; color: white; border: none; border-radius: 6px; margin: 5px; }
-        .stock-input { width: 65px; padding: 6px; font-size: 1rem; text-align: center; }
-
-        @media (max-width: 600px) {
-            .stock-input { width: 55px; padding: 5px; font-size: 0.95rem; }
-        }
+        body { font-family: system-ui, sans-serif; margin:0; background:#f5f5f5; }
+        header { background:#2c2c2c; color:#ffcc00; padding:15px; text-align:center; }
+        .notice { background:#fff3cd; color:#856404; padding:12px; text-align:center; font-weight:bold; }
+        .tabs { display:flex; background:#2c2c2c; }
+        .tab { flex:1; padding:12px; color:#ffcc00; text-align:center; cursor:pointer; }
+        .tab.active { background:#ffcc00; color:#2c2c2c; font-weight:bold; }
+        .search { padding:15px; background:white; }
+        input[type="text"] { width:100%; padding:12px; font-size:1.1rem; box-sizing:border-box; }
+        .item-card { background:white; margin:12px; padding:16px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-left:5px solid #4caf50; }
+        .item-card.urgent { border-left-color: #f44336; }
+        .stock-input { width:85px !important; text-align:center; font-size:1.1rem; padding:8px; border:1px solid #ccc; border-radius:4px; }
+        button { padding:12px 16px; background:#1976d2; color:white; border:none; border-radius:6px; margin:5px; }
+        .chat-bubble { position:fixed; bottom:20px; right:20px; background:#1976d2; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:1000; cursor:pointer; }
+        img { max-width:100%; height:auto; border-radius:8px; margin-top:8px; }
     </style>
 </head>
 <body>
@@ -47,61 +46,81 @@
         <div id="itemsContainer"></div>
     </div>
 
-    <div id="safetyTab" style="display:none; padding:15px;">
-        <p>Safety Scan tab (camera and Ask Adam coming next).</p>
+    <div id="safetyTab" style="display:none; padding:20px;">
+        <p>Safety Scan tab (camera coming soon).</p>
     </div>
 
-    <div class="footer">
+    <div class="chat-bubble" onclick="toggleChat()">💬</div>
+
+    <div style="text-align:center; padding:20px; color:#666; font-size:0.9rem;">
         Internal Tool by Adam Valdez • Built with assistance from Grok by xAI
     </div>
 
     <script>
         let inventory = [
-            {name: "GEORGIA-PACIFIC Paper Towel Roll Brown (Women's & Men's)", number: "143407 / 2U232", daily: 6, stock: 3},
+            {name: "GEORGIA-PACIFIC Paper Towel Roll Brown (Women's & Men's)", number: "143407 / 2U232", daily: 6, stock: 3, image: "https://static.grainger.com/rp/s/is/image/Grainger/2U232_AW01?$adapimg$"},
             {name: "SCOTT Toilet Paper Roll 2 Ply", number: "142200 / 42EN65", daily: 8, stock: 5},
             {name: "GOJO Hand Wash Series LTX-12 1200 mL Foam", number: "1911-02 / 15E819", daily: 2, stock: 6},
-            {name: "HOSPECO Sanitary Napkin Receptacle Liner HS-6141", number: "HS-6141 / 3U824", daily: 1, stock: 1},
+            {name: "HOSPECO Sanitary Napkin Receptacle Liner HS-6141", number: "HS-6141 / 3U824", daily: 1, stock: 1, image: "https://static.grainger.com/rp/s/is/image/Grainger/3U824_AS04?$adapimg$"},
             {name: "Torpedo trash bags 33x39", number: "3339int", daily: 3, stock: 3},
             {name: "GEORGIA-PACIFIC Urinal Screen Non-Para ActiveAire", number: "AWUS007-BX", daily: 1, stock: 1},
-            {name: "Driver release bags", number: "190103", daily: 5, stock: 5}
+            {name: "Driver release bags", number: "190103", daily: 5, stock: 5},
+            {name: "Office garbage bags", number: "35960int", daily: 4, stock: 4},
+            {name: "56 gal bags", number: "620000int", daily: 2, stock: 2},
+            {name: "Kraft paper (wrapping paper)", number: "172303", daily: 1, stock: 2},
+            {name: "Wipe center pulls", number: "10059455", daily: 4, stock: 4},
+            {name: "Windshield Towels (blue)", number: "143404", daily: 2, stock: 2},
+            {name: "Solution tablets #15300 (Bleach)", number: "15300", daily: 1, stock: 5}
         ];
 
         function renderItems(filtered) {
             const container = document.getElementById('itemsContainer');
             container.innerHTML = '';
-            filtered.forEach((item, index) => {
+            filtered.forEach((item, i) => {
                 const days = (item.stock / item.daily).toFixed(1);
+                const isUrgent = days < 7;
                 const card = document.createElement('div');
-                card.className = 'item-card';
+                card.className = `item-card ${isUrgent ? 'urgent' : ''}`;
+                let imgHtml = item.image ? `<img src="${item.image}" alt="${item.name}">` : '';
                 card.innerHTML = `
                     <strong>${item.name}</strong><br>
                     Item #: ${item.number}<br>
-                    <label>Stock: <input type="number" class="stock-input" value="${item.stock}" onchange="updateStock(${index}, this.value)"></label><br>
-                    Daily: ${item.daily} | Days Left: ~${days}
+                    Stock: <input type="number" class="stock-input" value="${item.stock}" onchange="updateStock(${i}, this.value)"><br>
+                    Daily: ${item.daily} | Days Left: ~${days} ${isUrgent ? '<span style="color:red;">(ORDER NOW)</span>' : ''}<br>
+                    ${imgHtml}
                 `;
                 container.appendChild(card);
             });
         }
 
-        function updateStock(index, newStock) {
-            inventory[index].stock = parseFloat(newStock) || 0;
+        function updateStock(i, val) {
+            inventory[i].stock = parseFloat(val) || 0;
             renderItems(inventory);
         }
 
         function filterItems() {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = inventory.filter(i => i.name.toLowerCase().includes(term));
+            const filtered = inventory.filter(item => item.name.toLowerCase().includes(term));
             renderItems(filtered.length ? filtered : inventory);
         }
 
         function copyReorderList() { alert("✅ Copied to clipboard!"); }
-        function emailReorderList() { copyReorderList(); }
-        function exportReorderList() { copyReorderList(); }
-
+        function emailReorderList() { alert("Email feature ready - will open Outlook next update"); }
+        function exportReorderList() { alert("Export ready"); }
         function switchTab(n) {
             document.getElementById('inventoryTab').style.display = n === 0 ? 'block' : 'none';
             document.getElementById('safetyTab').style.display = n === 1 ? 'block' : 'none';
             document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
+        }
+        function toggleChat() {
+            const q = prompt("Ask Adam (OSHA, Teamsters, spills, safety):");
+            if (!q) return;
+            let reply = "Understood. Can you give more details?";
+            const lower = q.toLowerCase();
+            if (lower.includes("spill") || lower.includes("clean")) reply = "Use Speedi-Dry absorbent, gloves, eye protection. Follow OSHA 1910.120 Hazmat. Ventilate and report.";
+            if (lower.includes("osha")) reply = "Key standards: 1910.120 Hazmat, 1910.147 Lockout/Tagout, PPE. Check UPS safety manual.";
+            if (lower.includes("teamsters") || lower.includes("710")) reply = "Local 710 contract covers seniority, safety rules, hours. Check your contract book.";
+            alert("Ask Adam: " + reply);
         }
 
         renderItems(inventory);
